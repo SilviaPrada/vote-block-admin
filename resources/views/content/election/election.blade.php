@@ -34,7 +34,15 @@
                                 <td>{{ $election['name'] }}</td>
                                 <td>{{ $election['description'] }}</td>
                                 <td>
-                                    <span class="badge rounded-pill bg-label-primary me-1">
+                                    <span class="badge rounded-pill 
+                                        @if($election['status'] == 'Active')
+                                            bg-primary
+                                        @elseif($election['status'] == 'Inactive')
+                                            bg-danger
+                                        @else
+                                            bg-success
+                                        @endif
+                                    ">
                                         {{ $election['status'] }}
                                     </span>
                                 </td>
