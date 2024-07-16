@@ -1,9 +1,11 @@
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Add Voter')
+@section('title', $voter ? 'Edit Voter' : 'Add Voter')
 
 @section('content')
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Forms/</span> Add Voter</h4>
+    <h4 class="py-3 mb-4">
+        <span class="text-muted fw-light">{{ $voter ? 'Edit' : 'Add' }} Voter</span>
+    </h4>
 
     @if(session('success'))
         <div class="alert alert-success">
@@ -23,33 +25,37 @@
 
     <div class="card mb-4">
         <div class="card-header d-flex align-items-center justify-content-between">
-            <h5 class="mb-0">Add Voter</h5>
+            <h5 class="mb-0">{{ $voter ? 'Edit' : 'Add' }} Voter</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('store-voter') }}" method="POST">
+            <form action="{{ $voter ? route('update-voter', $voterId) : route('store-voter') }}" method="POST">
                 @csrf
+                @if($voter)
+                    @method('PUT')
+                @endif
+
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label" for="voter_id">ID</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="voter_id" name="voter_id" placeholder="1234567890" required />
+                        <input type="text" class="form-control" id="voter_id" name="voter_id" value="{{ old('voter_id', $voter['voter_id'] ?? '') }}" required />
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label" for="name">Name</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="name" name="name" placeholder="John Doe" required />
+                        <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $voter['name'] ?? '') }}" required />
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label" for="email">Email (Optional)</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="email" name="email" placeholder="john.doe@example.com" />
+                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $voter['email'] ?? '') }}" />
                     </div>
                 </div>
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label" for="password">Password</label>
                     <div class="col-sm-10">
-                        <input type="password" class="form-control" id="password" name="password" placeholder="******" required />
+                        <input type="password" class="form-control" id="password" name="password" value="{{ old('password', $voter['password'] ?? '') }}" required />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -57,7 +63,8 @@
                     <div class="col-sm-10">
                         @foreach($elections as $election)
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="{{ $election['election_id'] }}" id="election-{{ $election['election_id'] }}" name="elections[]">
+                                <input class="form-check-input" type="checkbox" value="{{ $election['election_id'] }}" id="election-{{ $election['election_id'] }}" name="elections[]" 
+                                    @if(isset($voter) && in_array($election['election_id'], $voter['elections'])) checked @endif>
                                 <label class="form-check-label" for="election-{{ $election['election_id'] }}">
                                     {{ $election['name'] }}
                                 </label>
@@ -66,21 +73,8 @@
                     </div>
                 </div>
                 <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label">Has Voted</label>
-                    <div class="col-sm-10">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="hasVoted" id="hasVotedYes" value="1" required>
-                            <label class="form-check-label" for="hasVotedYes">Yes</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="hasVoted" id="hasVotedNo" value="0" required>
-                            <label class="form-check-label" for="hasVotedNo">No</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row justify-content-end">
-                    <div class="col-sm-10">
-                        <button type="submit" class="btn btn-primary">Add Voter</button>
+                    <div class="col-sm-10 offset-sm-2">
+                        <button type="submit" class="btn btn-primary">{{ $voter ? 'Update' : 'Add' }} Voter</button>
                     </div>
                 </div>
             </form>

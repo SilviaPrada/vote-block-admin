@@ -33,20 +33,34 @@
                                 <td>{{ $voter['email'] }}</td>
                                 <td>
                                     @if(isset($voter['elections']))
-                                        @foreach($voter['elections'] as $electionId)
-                                            @foreach($elections as $election)
-                                                @if($election['election_id'] == $electionId)
-                                                    <span class="badge bg-label-primary">{{ $election['name'] }}</span>
-                                                @endif
+                                        <ul>
+                                            @foreach($voter['elections'] as $electionId)
+                                                @foreach($elections as $election)
+                                                    @if($election['election_id'] == $electionId)
+                                                        <li><span class="badge bg-label-primary">{{ $election['name'] }}</span></li>
+                                                    @endif
+                                                @endforeach
                                             @endforeach
-                                        @endforeach
+                                        </ul>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($voter['hasVoted'])
-                                        <i class="mdi mdi-check-circle-outline text-success"></i> Yes
-                                    @else
-                                        <i class="mdi mdi-close-circle-outline text-danger"></i> No
+                                    @if(isset($voter['elections']))
+                                        <ul>
+                                            @foreach($voter['elections'] as $electionId)
+                                                @php
+                                                    $voterId = $voter['voter_id'];
+                                                    $hasVoted = isset($votesMapping[$voterId][$electionId]);
+                                                @endphp
+                                                <li>
+                                                    @if($hasVoted)
+                                                        <i class="mdi mdi-check-circle-outline text-success"></i> Yes
+                                                    @else
+                                                        <i class="mdi mdi-close-circle-outline text-danger"></i> No
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        </ul>
                                     @endif
                                 </td>
                                 <td>
@@ -55,8 +69,8 @@
                                             <i class="mdi mdi-dots-vertical"></i>
                                         </button>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="javascript:void(0);"><i class="mdi mdi-pencil-outline me-1"></i> Edit</a>
-                                            <a class="dropdown-item" href="javascript:void(0);"><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a>
+                                            <a class="dropdown-item" href="{{ route('edit-voter', $id) }}"><i class="mdi mdi-pencil-outline me-1"></i> Edit</a>
+                                            <a class="dropdown-item" href="{{ route('delete-voter', $id) }}"><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a>
                                         </div>
                                     </div>
                                 </td>
