@@ -26,8 +26,8 @@
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
-                    @if($elections)
-                        @foreach($elections as $id => $election)
+                    @if ($elections)
+                        @foreach ($elections as $id => $election)
                             <tr>
                                 <td>{{ $election['election_id'] }}</td>
                                 <td>{{ $election['date'] }}</td>
@@ -48,15 +48,26 @@
                                 </td>
                                 <td>
                                     <div class="dropdown">
-                                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                                            data-bs-toggle="dropdown">
                                             <i class="mdi mdi-dots-vertical"></i>
                                         </button>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="javascript:void(0);"><i class="mdi mdi-pencil-outline me-1"></i> Edit</a>
-                                            <a class="dropdown-item" href="javascript:void(0);"><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a>
+                                            <a class="dropdown-item" href="{{ route('election-form', $id) }}"><i
+                                                    class="mdi mdi-pencil-outline me-1"></i> Edit</a>
+                                            <form action="{{ route('delete-election', $id) }}" method="POST"
+                                                style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="dropdown-item" type="submit"
+                                                    onclick="return confirm('Are you sure you want to delete this election?')">
+                                                    <i class="mdi mdi-trash-can-outline me-1"></i> Delete
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </td>
+
                             </tr>
                         @endforeach
                     @else

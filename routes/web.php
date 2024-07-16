@@ -124,3 +124,7 @@ Route::get('/voters', [Voter::class, 'showVoters'])->name('voters');
 Route::get('/add-candidate', [Candidate::class, 'showAddCandidateForm'])->name('add-candidate');
 Route::post('/add-candidate', [Candidate::class, 'storeCandidate'])->name('store-candidate');
 Route::get('/candidates', [Candidate::class, 'showCandidates'])->name('candidates');
+
+Route::get('/election/form/{id?}', [Election::class, 'showElectionForm'])->name('election-form');
+Route::post('/election/store', [Election::class, 'storeElection'])->name('store-election');
+Route::delete('/delete-election/{id}', [Election::class, 'deleteElection'])->name('delete-election');
