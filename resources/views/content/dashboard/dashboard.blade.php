@@ -200,13 +200,12 @@
                 <table class="table">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-truncate">Election Name</th>
-                            <th class="text-truncate">Candidate Name</th>
-                            <th class="text-truncate">Voter ID</th>
-                            <th class="text-truncate">Vote Count</th>
                             <th class="text-truncate">Date</th>
                             <th class="text-truncate">Transaction Hash</th>
                             <th class="text-truncate">Block Number</th>
+                            <th class="text-truncate">Election Name</th>
+                            <th class="text-truncate">Candidate Name</th>
+                            <th class="text-truncate">Vote Count</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -217,15 +216,14 @@
                                     $candidateId = hexdec($voteSet[1]['hex']);
                                 @endphp
                                 <tr>
-                                    <td class="text-truncate">{{ $electionNames[$electionId] ?? 'Unknown' }}</td>
-                                    <td class="text-truncate">{{ $candidateNames[$candidateId] ?? 'Unknown' }}</td>
-                                    <td class="text-truncate">{{ hexdec($voteSet[2]['hex']) }}</td>
-                                    <td class="text-truncate">{{ hexdec($voteSet[3]['hex']) }}</td>
                                     <td class="text-truncate">
                                         {{ \Carbon\Carbon::createFromTimestamp(hexdec($voteSet[4]['hex']))->toDateTimeString() }}
                                     </td>
-                                    <td class="text-truncate">{{ $voteSet[5] }}</td>
+                                    <td class="text-truncate">{{ Str::limit($voteSet[5], 10, '...') }}</td>
                                     <td class="text-truncate">{{ hexdec($voteSet[6]['hex']) }}</td>
+                                    <td class="text-truncate">{{ $electionNames[$electionId] ?? 'Unknown' }}</td>
+                                    <td class="text-truncate">{{ $candidateNames[$candidateId] ?? 'Unknown' }}</td>
+                                    <td class="text-truncate">{{ hexdec($voteSet[3]['hex']) }}</td>
                                 </tr>
                             @endforeach
                         @else

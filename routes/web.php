@@ -48,9 +48,9 @@ use App\Http\Controllers\election\Voter;
 use App\Http\Controllers\election\Candidate;
 use App\Http\Controllers\dashboard\Dashboard;
 
-// Main Page Route
-Route::get('/', [Analytics::class, 'index'])->name('dashboard-analytics');
-Route::get('/dashboard', [Dashboard::class, 'index'])->name('dashboard');
+// // Main Page Route
+// Route::get('/', [Analytics::class, 'index'])->name('dashboard-analytics');
+Route::get('/', [Dashboard::class, 'index'])->name('dashboard');
 
 // layout
 Route::get('/layouts/without-menu', [WithoutMenu::class, 'index'])->name('layouts-without-menu');
