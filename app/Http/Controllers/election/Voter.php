@@ -11,11 +11,14 @@ class Voter extends Controller
 {
     public function connect()
     {
-        $firebase = (new Factory)
+        $factory = (new Factory)
                     ->withServiceAccount(base_path(env('FIREBASE_CREDENTIALS')))
                     ->withDatabaseUri(env("FIREBASE_DATABASE_URL"));
 
-        return $firebase->createDatabase();
+        return [
+            'database' => $factory->createDatabase(),
+            'auth' => $factory->createAuth(),
+        ];
     }
 
     public function fetchVotes()
@@ -31,7 +34,8 @@ class Voter extends Controller
 
     public function showAddVoterForm()
     {
-        $elections = $this->connect()->getReference('elections')->getValue();
+        $connections = $this->connect();
+        $elections = $connections['database']->getReference('elections')->getValue();
         return view('content.voter.add-voter', ['elections' => $elections, 'voter' => null]);
     }
 
@@ -45,7 +49,9 @@ class Voter extends Controller
             'elections' => 'required|array',
         ]);
 
-        $database = $this->connect();
+        $connections = $this->connect();
+        $database = $connections['database'];
+        $auth = $connections['auth'];
         $voter_id = $request->input('voter_id');
         $election_ids = $request->input('elections');
 
@@ -56,6 +62,14 @@ class Voter extends Controller
             }
         }
 
+        // Create Auth Account
+        try {
+            $auth->createUserWithEmailAndPassword($request->input('email'), $request->input('password'));
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['Error creating authentication account: ' . $e->getMessage()]);
+        }
+
+        // Store Voter in Database
         $newVoterRef = $database->getReference('voters')->push();
         $newVoterRef->set([
             'voter_id' => $voter_id,
@@ -70,7 +84,8 @@ class Voter extends Controller
 
     public function editVoterForm($id)
     {
-        $database = $this->connect();
+        $connections = $this->connect();
+        $database = $connections['database'];
         $voter = $database->getReference('voters/' . $id)->getValue();
         $elections = $database->getReference('elections')->getValue();
 
@@ -87,7 +102,22 @@ class Voter extends Controller
             'elections' => 'required|array',
         ]);
 
-        $database = $this->connect();
+        $connections = $this->connect();
+        $database = $connections['database'];
+        $auth = $connections['auth'];
+
+        // Update Auth Account
+        try {
+            $auth->updateUser($id, [
+                'email' => $request->input('email'),
+                'password' => $request->input('password'),
+                'displayName' => $request->input('name'),
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['Error updating authentication account: ' . $e->getMessage()]);
+        }
+
+        // Update Voter in Database
         $database->getReference('voters/' . $id)->update([
             'voter_id' => $request->input('voter_id'),
             'name' => $request->input('name'),
@@ -101,14 +131,27 @@ class Voter extends Controller
 
     public function deleteVoter($id)
     {
-        $this->connect()->getReference('voters/' . $id)->remove();
+        $connections = $this->connect();
+        $database = $connections['database'];
+        $auth = $connections['auth'];
+
+        // Delete Auth Account
+        try {
+            $auth->deleteUser($id);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['Error deleting authentication account: ' . $e->getMessage()]);
+        }
+
+        // Delete Voter in Database
+        $database->getReference('voters/' . $id)->remove();
 
         return redirect()->route('voters')->with('success', 'Voter deleted successfully!');
     }
 
     public function showVoters()
     {
-        $database = $this->connect();
+        $connections = $this->connect();
+        $database = $connections['database'];
         $voters = $database->getReference('voters')->getValue();
         $elections = $database->getReference('elections')->getValue();
         $votes = $this->fetchVotes();
